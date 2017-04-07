@@ -172,7 +172,8 @@ bool SortedListClass< T >::removeFront(T &theVal)
   //list is empty
   if (head == NULL)
   {
-    cout << "List is empty, removing front fails!" << endl;
+    cout << "List is empty, removing front fails!" 
+         << endl << endl;
   }
   //list is not empty
   else if (head == tail)
@@ -181,6 +182,8 @@ bool SortedListClass< T >::removeFront(T &theVal)
     head = NULL;
     tail = NULL;
     removeStatus = true;
+    cout << "After removal, this list is empty!" 
+         << endl << endl;
   }
   else 
   {
@@ -265,7 +268,7 @@ bool SortedListClass< T >::getElemAtIndex(const int index, T &outVal)
   //if not an empty list
   if (temp != NULL)
   {
-    int currentPosition(1);
+    int currentPosition(0);
     //loop through list to print all nodes
     while(temp != tail && currentPosition != index)
     {
