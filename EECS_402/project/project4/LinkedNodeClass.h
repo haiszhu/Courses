@@ -57,13 +57,13 @@ class LinkedNodeClass
     //to "this" node, but "this" node itself remains unchanged.
     void setBeforeAndAfterPointers(
         );
-    {
+    //{
       //new node set up already
       //this->prevNode->nextNode = this;
       //check if this->prevNode is null or not
       //this->nextNode->prevNode = this;
       
-    }
+    //}
 };
 
 #include "LinkedNodeClass.inl"

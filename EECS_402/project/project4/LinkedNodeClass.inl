@@ -1,5 +1,3 @@
-#include "LinkedNodeClass.h"
-
 //Only one constructor may be used in this project!
 template< class T >
 LinkedNodeClass<T>::LinkedNodeClass(
@@ -17,21 +15,21 @@ LinkedNodeClass<T>::LinkedNodeClass(
 template< class T >
 T LinkedNodeClass<T>::getValue() const
 {
-  return nodeVal;
+  return (nodeVal);
 }
 
 //Returns the address of the node that follows this node.
 template< class T >
 LinkedNodeClass<T>* LinkedNodeClass<T>::getNext() const
 {
-  return nextNode;
+  return (nextNode);
 }
 
 //Returns the address of the node that comes before this node.
 template< class T >
 LinkedNodeClass<T>* LinkedNodeClass<T>::getPrev() const
 {
-  return prevNode;
+  return (prevNode);
 }
 
 //Sets the object’s next node pointer to NULL.
@@ -53,6 +51,24 @@ void LinkedNodeClass<T>::setPreviousPointerToNull()
 template< class T >
 void LinkedNodeClass<T>::setBeforeAndAfterPointers()
 {
-  (*prevNode).nextNode = this;
-  (*nextNode).prevNode = this;
+  //(*prevNode).nextNode = this;
+  //(*nextNode).prevNode = this;
+  //new node set up already
+  if (this->prevNode != NULL)
+  {
+    this->prevNode->nextNode = this;
+  }
+  else
+  {
+    cout << "Before is null, you are at the beginning of a list!" << endl;
+  }
+  //check if this->prevNode is null or not
+  if (this->nextNode != NULL)
+  {
+    this->nextNode->prevNode = this;
+  }
+  else
+  {
+    cout << "After is null, you are at the end of a list!" << endl;
+  }
 }
