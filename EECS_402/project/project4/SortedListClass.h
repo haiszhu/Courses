@@ -1,3 +1,12 @@
+/* ----------------------------------------------------------------------
+ * SortedListClass.h
+ *
+ * 04/10/2017 Hai Zhu
+ *
+ * Sorted list template class header file
+ ------------------------------------------------------------------------
+ */
+
 #ifndef SORTEDLISTCLASS_H
 #define SORTEDLISTCLASS_H
 

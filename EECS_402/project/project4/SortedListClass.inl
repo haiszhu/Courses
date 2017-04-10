@@ -1,4 +1,14 @@
+/* ----------------------------------------------------------------------
+ * SortedListClass.inl
+ *
+ * 04/10/2017 Hai Zhu
+ *
+ * Sorted list template class ctor, dtor, and member functions
+ ------------------------------------------------------------------------
+ */
+
 #include <iostream>
+using namespace std;
 #include "LinkedNodeClass.h"
 
 //Default Constructor. Will properly initialize a list to

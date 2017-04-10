@@ -1,12 +1,22 @@
+/* ----------------------------------------------------------------------
+ * FIFOQueueClass.inl
+ *
+ * 04/10/2017 Hai Zhu
+ *
+ * first in first out queue class ctor, dtor, and member function
+ ------------------------------------------------------------------------
+ */
+
 #include <iostream>
 #include "LinkedNodeClass.h"
+#include "constants.h"
 
 //Default Constructor. Will properly initialize a queue to 
 //be an empty queue, to which values can be added. 
 template < class T >
 FIFOQueueClass< T >::FIFOQueueClass()
 {
-  cout << "Default ctor was called!" << endl;
+  //cout << "Default ctor was called!" << endl;
   //assign both head and tail to null pointer
   head = NULL;
   tail = NULL;
@@ -24,7 +34,7 @@ void FIFOQueueClass< T >::enqueue(const T &newItem)
     newNode = new LinkedNodeClass< T >(head, newItem, tail);
     head = newNode;
     tail = newNode;
-    cout << "The list is empty before inserting " << newItem << endl;
+    //cout << "The list is empty before inserting " << newItem << endl;
     //cout << head << endl;
   }
   //list is not empty
@@ -32,15 +42,15 @@ void FIFOQueueClass< T >::enqueue(const T &newItem)
   { 
     newNode = new LinkedNodeClass< T >(tail, newItem, NULL);
     tail = newNode;   //modify tail to point to tail
-    cout << "Insert value " << newItem << " at the end of a list!" 
-         << endl;
+    //cout << "Insert value " << newItem << " at the end of a list!" 
+    //     << endl;
     //update pointer for adjacent nodes
     newNode->setBeforeAndAfterPointers();
   } 
   //head and tail not consistent
   else
   {
-    cout << "Only one of head or tail is pointing to NULL!" << endl;
+    //cout << "Only one of head or tail is pointing to NULL!" << endl;
   }
   
 }
@@ -55,23 +65,30 @@ bool FIFOQueueClass< T >::dequeue(T &outItem)
   //list is empty
   if (head == NULL)
   {
-    cout << "List is empty, removing front fails!" 
-         << endl << endl;
+    //cout << "List is empty, removing front fails!" 
+    //     << endl << endl;
   }
   //list is not empty
   else if (head == tail)
   {
+    outItem = head->getValue(); 
+    
     delete head;
     head = NULL;
     tail = NULL;
     dequeueStatus = true;
-    cout << "After removal, this queue is empty!" 
-         << endl << endl;
+    //cout << "After removal, this queue is empty!" 
+    //     << endl << endl;
   }
   else 
   {
     //get value to be removed
     outItem = head->getValue(); 
+    
+    //int dummy;
+    //outItem.getValue(dummy);
+    //cout << "Error Checking " << dummy << endl;
+    
     pDelNode = head;
     head = head->getNext(); //correct head accordingly
     //clear memory 
@@ -95,7 +112,20 @@ void FIFOQueueClass< T >::print() const
     //loop through list to print all nodes
     while(temp != NULL)
     {
-      cout << " " << temp->getValue(); //<< endl;
+      
+      T tempValue;
+      tempValue = temp->getValue();
+      int info;
+      try
+      {
+        cout << " " << temp ;
+      }
+      catch (T tempValue)
+      {
+        tempValue.getValue(info);
+        cout << " " << info; //<< endl; 
+      }
+      
       temp = temp->getNext();
     }
     cout << endl;
@@ -112,7 +142,7 @@ template < class T >
 int FIFOQueueClass< T >::getNumElems() const
 {
   LinkedNodeClass< T >* temp = head;
-  int numElems(0);
+  int numElems(INI_VALUE);
   if (temp != NULL)
   {
     //we are at 1st node
@@ -124,7 +154,7 @@ int FIFOQueueClass< T >::getNumElems() const
       numElems = numElems + 1;
     } //get to tail position, count is over
   }
-  cout << "There are " << numElems << " nodes in this queue!" << endl;
-  cout << endl;
+  //cout << "There are " << numElems << " nodes in this queue!" << endl;
+  //cout << endl;
   return (numElems);
 }

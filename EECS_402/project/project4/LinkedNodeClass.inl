@@ -1,3 +1,14 @@
+/* ----------------------------------------------------------------------
+ * LinkedNodeClass.inl
+ *
+ * 04/10/2017 Hai Zhu
+ *
+ * linked node class ctor, dtor, and member function
+ ------------------------------------------------------------------------
+ */
+
+#include <iostream>
+
 //Only one constructor may be used in this project!
 template< class T >
 LinkedNodeClass<T>::LinkedNodeClass(
@@ -51,16 +62,14 @@ void LinkedNodeClass<T>::setPreviousPointerToNull()
 template< class T >
 void LinkedNodeClass<T>::setBeforeAndAfterPointers()
 {
-  //(*prevNode).nextNode = this;
-  //(*nextNode).prevNode = this;
-  //new node set up already
+  
   if (this->prevNode != NULL)
   {
     this->prevNode->nextNode = this;
   }
   else
   {
-    cout << "Before is null, you are at the beginning of a list!" << endl;
+    //cout << "Before is null, you are at the beginning of a list!" << endl;
   }
   //check if this->prevNode is null or not
   if (this->nextNode != NULL)
@@ -69,6 +78,6 @@ void LinkedNodeClass<T>::setBeforeAndAfterPointers()
   }
   else
   {
-    cout << "After is null, you are at the end of a list!" << endl;
+    //cout << "After is null, you are at the end of a list!" << endl;
   }
 }

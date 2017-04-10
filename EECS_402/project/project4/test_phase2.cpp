@@ -13,6 +13,21 @@ int main()
   FIFOQueueClass< int > testQueue;
   testQueue.getNumElems();
   
+  for (int i=0; i < num; i++)
+  {
+    testQueue.enqueue(array[i]);
+    testQueue.print();
+    testQueue.getNumElems();
+  }
+  
+  int outItem(0);
+  for (int i=0; i < num; i++)
+  {
+    testQueue.dequeue(outItem);
+    testQueue.print();
+    testQueue.getNumElems();
+  }
+  
   /*
   testList.getNumElems();
   for (int i=0; i < num; i++)

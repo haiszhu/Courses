@@ -1,5 +1,16 @@
+/* ----------------------------------------------------------------------
+ * FIFOQueueClass.h
+ *
+ * 04/10/2017 Hai Zhu
+ *
+ * first in first out queue class header file
+ ------------------------------------------------------------------------
+ */
+
 #ifndef _FIFOQUEUE_TEMPLATE_H
 #define _FIFOQUEUE_TEMPLATE_H
+#include "LinkedNodeClass.h"
+#include "constants.h"
 
 template < class T >
 class FIFOQueueClass
@@ -44,8 +55,6 @@ class FIFOQueueClass
         int getNumElems(
             ) const;
 
-        //clears the queue
-        //void clear();
 };
 #include "FIFOQueueClass.inl"
 #endif
