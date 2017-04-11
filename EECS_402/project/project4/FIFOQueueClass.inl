@@ -1,10 +1,15 @@
-/* ----------------------------------------------------------------------
+/* -------------------------------------------------------------------
  * FIFOQueueClass.inl
  *
  * 04/10/2017 Hai Zhu
  *
  * first in first out queue class ctor, dtor, and member function
- ------------------------------------------------------------------------
+ *
+ * (notes: to actually use print() function, the template accept int
+ * and char directly, or your class T needs to have getValue() member
+ * function to access value you want to get printed, and based on
+ * that this memeber function needs to be modified accordingly)
+ ---------------------------------------------------------------------
  */
 
 #include <iostream>
@@ -16,8 +21,6 @@
 template < class T >
 FIFOQueueClass< T >::FIFOQueueClass()
 {
-  //cout << "Default ctor was called!" << endl;
-  //assign both head and tail to null pointer
   head = NULL;
   tail = NULL;
 }
@@ -34,7 +37,8 @@ void FIFOQueueClass< T >::enqueue(const T &newItem)
     newNode = new LinkedNodeClass< T >(head, newItem, tail);
     head = newNode;
     tail = newNode;
-    //cout << "The list is empty before inserting " << newItem << endl;
+    //cout << "The list is empty before inserting "
+    //     << newItem << endl;
     //cout << head << endl;
   }
   //list is not empty
@@ -42,7 +46,8 @@ void FIFOQueueClass< T >::enqueue(const T &newItem)
   { 
     newNode = new LinkedNodeClass< T >(tail, newItem, NULL);
     tail = newNode;   //modify tail to point to tail
-    //cout << "Insert value " << newItem << " at the end of a list!" 
+    //cout << "Insert value " << newItem
+    //     << " at the end of a list!"
     //     << endl;
     //update pointer for adjacent nodes
     newNode->setBeforeAndAfterPointers();
@@ -50,7 +55,8 @@ void FIFOQueueClass< T >::enqueue(const T &newItem)
   //head and tail not consistent
   else
   {
-    //cout << "Only one of head or tail is pointing to NULL!" << endl;
+    //cout << "Only one of head or tail is pointing to NULL!"
+    //     << endl;
   }
   
 }
@@ -84,11 +90,6 @@ bool FIFOQueueClass< T >::dequeue(T &outItem)
   {
     //get value to be removed
     outItem = head->getValue(); 
-    
-    //int dummy;
-    //outItem.getValue(dummy);
-    //cout << "Error Checking " << dummy << endl;
-    
     pDelNode = head;
     head = head->getNext(); //correct head accordingly
     //clear memory 
@@ -116,16 +117,7 @@ void FIFOQueueClass< T >::print() const
       T tempValue;
       tempValue = temp->getValue();
       int info;
-      try
-      {
-        cout << " " << temp ;
-      }
-      catch (T tempValue)
-      {
-        tempValue.getValue(info);
-        cout << " " << info; //<< endl; 
-      }
-      
+      cout << " " << temp ;
       temp = temp->getNext();
     }
     cout << endl;
@@ -154,7 +146,8 @@ int FIFOQueueClass< T >::getNumElems() const
       numElems = numElems + 1;
     } //get to tail position, count is over
   }
-  //cout << "There are " << numElems << " nodes in this queue!" << endl;
+  //cout << "There are " << numElems
+  //     << " nodes in this queue!" << endl;
   //cout << endl;
   return (numElems);
 }

@@ -1,10 +1,10 @@
-/* ----------------------------------------------------------------------
+/* --------------------------------------------------------------
  * CarClass.h
  *
  * 03/21/2017 Hai Zhu
  *
  * Car Class header file
- ------------------------------------------------------------------------
+ ----------------------------------------------------------------
  */
 
 #ifndef CARCLASS_H
@@ -15,14 +15,15 @@
 class CarClass
 {
   public:
-    CarClass();                                  //default ctor
-    CarClass(int arrivalTime);             //value ctor
-    ~CarClass();                                 //dtor
+    CarClass();                               //default ctor
+    CarClass(int arrivalTime);                //value ctor
+    ~CarClass();                              //dtor
   
-    void getCarArrivalTime(int &arrivalTime);
+    //private variable related
+    void getCarArrivalTime(int &arrivalTime); //ger arrival time
     
   private:
-    int carArrivalTime;                           //int results of return value
+    int carArrivalTime;                       //car arrival time
 
 };
 #endif

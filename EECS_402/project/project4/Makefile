@@ -1,5 +1,7 @@
-proj4.exe: main.o RiderClass.o CarClass.o AttractionClass.o random.o readInFromFile.o detRiderType.o
-	g++ main.o RiderClass.o CarClass.o AttractionClass.o random.o readInFromFile.o detRiderType.o -o proj4.exe
+proj4.exe: main.o RiderClass.o CarClass.o AttractionClass.o \
+           random.o readInFromFile.o detRiderType.o
+	g++ main.o RiderClass.o CarClass.o AttractionClass.o \
+        random.o readInFromFile.o detRiderType.o -o proj4.exe
 
 main.o: test_phase3.cpp
 	g++ -c test_phase3.cpp -o main.o
@@ -23,4 +25,5 @@ detRiderType.o: detRiderType.cpp detRiderType.h
 	g++ -c detRiderType.cpp -o detRiderType.o
 
 clean:
-	rm -rf main.o RiderClass.o CarClass.o AttractionClass.o random.o readInFromFile.o detRiderType.o proj4.exe
+	rm -rf main.o RiderClass.o CarClass.o AttractionClass.o \
+           random.o readInFromFile.o detRiderType.o proj4.exe

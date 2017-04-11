@@ -68,7 +68,8 @@ void AttractionClass::getNumberOfSeats(int &numOfSeats)
 }
 
 //get number of riders along lineIndex line
-void AttractionClass::getNumberOfRider(int &numOfRider, int lineIndex)
+void AttractionClass::getNumberOfRider(int &numOfRider,
+                                       int lineIndex)
 {
   numOfRider = numberOfRider[lineIndex];
 }
@@ -139,7 +140,8 @@ void AttractionClass::getRiderToCar(int idealNum[], int realNum[],
       increNumOfNextPriority = tempIdealNum - tempNumOfRider;
       realNum[i] = tempNumOfRider;
       cout << "      Now number of riders in line is " 
-           << i << " is " << tempNumOfRider - tempNumOfRider << endl;
+           << i << " is " << tempNumOfRider - tempNumOfRider
+           << endl;
     }
   }
 }

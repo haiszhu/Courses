@@ -29,9 +29,9 @@ class LinkedNodeClass
     //newly created node's previous pointer, value, and next pointer,
     //and assigns them.
     LinkedNodeClass(
-        LinkedNodeClass *inPrev, //Address of node that comes before this one
+        LinkedNodeClass *inPrev, //Address of node coming before this one
         const T &inVal,          //Value to be contained in this node
-        LinkedNodeClass *inNext  //Address of node that comes after this one
+        LinkedNodeClass *inNext  //Address of node coming after this one
         );
     
     //Returns the value stored within this node.

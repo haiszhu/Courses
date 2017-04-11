@@ -1,10 +1,10 @@
-/* ----------------------------------------------------------------------
+/* ---------------------------------------------------------------
  * SortedListClass.inl
  *
  * 04/10/2017 Hai Zhu
  *
  * Sorted list template class ctor, dtor, and member functions
- ------------------------------------------------------------------------
+ -----------------------------------------------------------------
  */
 
 #include <iostream>
@@ -25,7 +25,8 @@ SortedListClass<T>::SortedListClass()
 //Copy constructor. Will make a complete copy of the list, such
 //that one can be changed without affecting the other.
 template< class T >
-SortedListClass< T >::SortedListClass(const SortedListClass< T > &rhs)
+SortedListClass< T >::SortedListClass(
+                            const SortedListClass< T > &rhs)
 {
   cout << "Copy ctor was called!" << endl;
   //assign head and tail to null in case &rhs is an empty list
@@ -39,7 +40,7 @@ SortedListClass< T >::SortedListClass(const SortedListClass< T > &rhs)
     while (temp != NULL)
     {
       //insert value, and also assign head and tail to correct
-      //address when inserting the first node in insertValue fun
+      //address when inserting the first node in insertValue
       insertValue(temp->getValue());
       temp = temp->getNext();
     }
@@ -73,7 +74,7 @@ template < class T >
 void SortedListClass< T >::insertValue(const T &valToInsert)
 {
   LinkedNodeClass< T >* newNode;  //newNode in link
-  LinkedNodeClass< T >* temp = head;  //point to insertation position
+  LinkedNodeClass< T >* temp = head; //ptr to insertat position
   
   //head is null, empty list
   if (temp == NULL) 
@@ -81,7 +82,8 @@ void SortedListClass< T >::insertValue(const T &valToInsert)
     newNode = new LinkedNodeClass< T >(temp, valToInsert, temp);
     head = newNode;
     tail = newNode;
-    cout << "The list is empty before inserting " << valToInsert << endl;
+    cout << "The list is empty before inserting "
+         << valToInsert << endl;
     //cout << head << endl;
   }
   
@@ -99,7 +101,8 @@ void SortedListClass< T >::insertValue(const T &valToInsert)
     {
       newNode = new LinkedNodeClass< T >(NULL, valToInsert, temp);
       head = newNode;   //modify head to point to head
-      cout << "Insert value " << valToInsert << " at the beginning of a list!" << endl;
+      cout << "Insert value " << valToInsert
+           << " at the beginning of a list!" << endl;
     }
     
     //insert at the end
@@ -107,14 +110,17 @@ void SortedListClass< T >::insertValue(const T &valToInsert)
     {
       newNode = new LinkedNodeClass< T >(tail, valToInsert, NULL);
       tail = newNode;   //modify tail to point to tail
-      cout << "Insert value " << valToInsert << " at the end of a list!" << endl;
+      cout << "Insert value " << valToInsert
+           << " at the end of a list!" << endl;
     }
     
     //insert in the middle
     else  
     {
-      newNode = new LinkedNodeClass< T >(temp->getPrev(),valToInsert, temp);
-      cout << "Insert value " << valToInsert << " in the middle of a list!" << endl;
+      newNode = new LinkedNodeClass< T >(temp->getPrev(),
+                                         valToInsert, temp);
+      cout << "Insert value " << valToInsert
+           << " in the middle of a list!" << endl;
       //cout << head << endl;
       //cout << temp->getPrev() << endl;
     }
@@ -171,8 +177,8 @@ void SortedListClass< T >::printBackward() const
 }
 
 
-//Removes the front item from the list and returns the value that 
-//was contained in it via the reference parameter.
+//Removes the front item from the list and returns the value
+//that was contained in it via the reference parameter.
 template < class T >
 bool SortedListClass< T >::removeFront(T &theVal)
 {
@@ -210,8 +216,8 @@ bool SortedListClass< T >::removeFront(T &theVal)
   return (removeStatus);
 }
 
-//Removes the last item from the list and returns the value that 
-//was contained in it via the reference parameter.
+//Removes the last item from the list and returns the value
+//that was contained in it via the reference parameter.
 template < class T >
 bool SortedListClass< T >::removeLast(T &theVal)
 {
@@ -262,7 +268,8 @@ int SortedListClass< T >::getNumElems() const
       numElems = numElems + 1;
     } //get to tail position, count is over
   }
-  cout << "There are " << numElems << " nodes in this list!" << endl;
+  cout << "There are " << numElems
+       << " nodes in this list!" << endl;
   cout << endl;
   return (numElems);
 }
@@ -270,7 +277,8 @@ int SortedListClass< T >::getNumElems() const
 //Provides the value stored in the node at index provided in the 
 //"index" parameter.
 template < class T >
-bool SortedListClass< T >::getElemAtIndex(const int index, T &outVal)
+bool SortedListClass< T >::getElemAtIndex(
+                           const int index, T &outVal)
 {
   bool getElemStatus = false;
   LinkedNodeClass< T >* temp = head; 

@@ -12,9 +12,9 @@
 //Only one constructor may be used in this project!
 template< class T >
 LinkedNodeClass<T>::LinkedNodeClass(
-        LinkedNodeClass *inPrev, //Address of node that comes before this one
-        const T &inVal,          //Value to be contained in this node
-        LinkedNodeClass *inNext  //Address of node that comes after this one
+        LinkedNodeClass *inPrev,
+        const T &inVal,
+        LinkedNodeClass *inNext
         )
 {
   prevNode = inPrev;
@@ -57,8 +57,9 @@ void LinkedNodeClass<T>::setPreviousPointerToNull()
   prevNode = NULL;
 }
 
-//Sets the previous node of THIS object to point its nextNode to THIS object
-//Sets the next node of THIS object to point its prevNode to THIS object
+//Sets the previous node of THIS object to point its nextNode to
+//THIS object Sets the next node of THIS object to point
+//its prevNode to THIS object
 template< class T >
 void LinkedNodeClass<T>::setBeforeAndAfterPointers()
 {
@@ -69,7 +70,8 @@ void LinkedNodeClass<T>::setBeforeAndAfterPointers()
   }
   else
   {
-    //cout << "Before is null, you are at the beginning of a list!" << endl;
+    //cout << "Before is null, you are at the beginning of a list!"
+    //     << endl;
   }
   //check if this->prevNode is null or not
   if (this->nextNode != NULL)
@@ -78,6 +80,7 @@ void LinkedNodeClass<T>::setBeforeAndAfterPointers()
   }
   else
   {
-    //cout << "After is null, you are at the end of a list!" << endl;
+    //cout << "After is null, you are at the end of a list!"
+    //     << endl;
   }
 }

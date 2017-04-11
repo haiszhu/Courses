@@ -4,6 +4,11 @@
  * 04/10/2017 Hai Zhu
  *
  * first in first out queue class header file
+ *
+* (notes: to actually use print() function, the template accept int
+ * and char directly, or your class T needs to have getValue() member
+ * function to access value you want to get printed, and based on
+ * that this memeber function needs to be modified accordingly)
  ------------------------------------------------------------------------
  */
 
