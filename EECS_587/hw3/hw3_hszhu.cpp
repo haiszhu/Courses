@@ -5,7 +5,7 @@
  *
  * EECS587 Parallel Computing Class, programming assignment
  * template calculation on an n x n matrix, where each entry are long int
- * 
+ *
  * A[i,j] depends on previous entry [i,j], [i+1,j], [i,j+1] and [i+1,j+1]
  * To run this programm on flux
  *    $ module load intel/17.0.1
@@ -15,26 +15,26 @@
  * where 1000 is the size of matrix A, and -np needs to perfect square
  ------------------------------------------------------------------------
  */
-
-#include<iostream>
-#include<cstdlib>
-#include<mpi.h>
-#include<math.h>
+#include <iostream>
+#include <cstdlib>
+#include <mpi.h>
+#include <math.h>
 
 #include "f.h"
 using namespace std;
 
 int main(int argc, char *argv[])
 {
-   
+  //take matrix size as input variable
   char *nTemp;
   if(argc < 2){
-    cout << "You must provide at least one argument!" << endl;
+    cout << "You must provide matrix size!" << endl;
   }
   for(int i=1; i<argc; i++){
     nTemp = argv[i];
   }
   
+  //MPI initialization
   int procID;
   int ierr;
   int p;
@@ -47,20 +47,24 @@ int main(int argc, char *argv[])
   MPI_Status status;
   MPI_Request  send_request,recv_request;
   
-  if( p != sqrt(p)*sqrt(p) ){
-    if( procID == 0 ){ 
+  //num of proc should be perfect square
+  int tempP = sqrt(p);
+  if( p != tempP*tempP ){
+    if( procID == 0 ){
       cout << "Num of processor should be perfect square, i.e. 4, 9, 16, 36."<< endl;
     }
+    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Finalize();
     exit(0);
   }
   
-  //index 
+  //index of current proc
   int n = atoi(nTemp);                //take matrix size as input
   int idx = floor(procID/sqrt(p));    //the row current proc is in the proc grid
   int idy = procID - sqrt(p)*idx;     //the column current proc is in the grid
   
   int nLocal = ceil(n/sqrt(p));       //submatrix size(roughly, not all are squares)
-  int nLocalx, nLocaly;               //exact submatrix num of rows and columns 
+  int nLocalx, nLocaly;               //exact submatrix num of rows and columns
   
   if( idx == sqrt(p)-1){              //last row of proc modification for nLocal
     nLocalx = n - nLocal*(sqrt(p)-1);
@@ -69,7 +73,7 @@ int main(int argc, char *argv[])
     } else{
       nLocaly = nLocal;
     }
-  } else if( idy == sqrt(p)-1 ){      //last column of proc modification 
+  } else if( idy == sqrt(p)-1 ){      //last column of proc modification
     nLocalx = nLocal;
     nLocaly = n - nLocal*(sqrt(p)-1);
   } else{                             //upper left procs are all squares
@@ -77,14 +81,33 @@ int main(int argc, char *argv[])
     nLocaly = nLocal;
   }
   
-  
-  //declare submatrix, row, and column vector
+  //actual subblock matrix assignment A_local
   long long** matrixALocal = new long long*[nLocalx+1];
-  long long* aCol = new long long[nLocalx]();
-  long long* aRow = new long long[nLocaly]();
-  long long aEntry = 0;
+  long long* aLcol = new long long[nLocalx];
+  long long* aUrow = new long long[nLocaly];
+  long long* aRcol = new long long[nLocalx]();
+  long long* aLrow = new long long[nLocaly]();
+  long long aLRentry(0);
+  long long aULentry;
+  
   int iGlobal, jGlobal;
-
+  int idxILow(0), idyJLow(0);
+  int idxIHi(nLocalx), idyJHi(nLocaly);
+  
+  //fiugre out which entry stay put in submatrix by modifying nLocal
+  if( idx == 0 ){
+    idxILow = 1;
+  }
+  if( idy == 0 ){
+    idyJLow = 1;
+  }
+  if( idx == sqrt(p)-1 ){
+    idxIHi = nLocalx-1;
+  }
+  if( idy == sqrt(p)-1 ){
+    idyJHi = nLocaly-1;
+  }
+  
   //initialization of Alocal, aRow, aCol, and aEntry
   for(int i=0; i<nLocalx; i++){
     matrixALocal[i] = new long long[nLocaly+1];
@@ -93,14 +116,15 @@ int main(int argc, char *argv[])
       jGlobal = idy*nLocal+j;         //global column index
       matrixALocal[i][j] = iGlobal + jGlobal*n;
     }
-    aCol[i] = matrixALocal[i][0];
+    aLcol[i] = matrixALocal[i][0];
   }
   matrixALocal[nLocalx] = new long long[nLocaly+1];
   for(int j=0; j<nLocaly; j++){
-    aRow[j] = matrixALocal[0][j];
+    aUrow[j] = matrixALocal[0][j];
   }
-  aEntry = matrixALocal[0][0];
+  aULentry = matrixALocal[0][0];
   
+  //start timing
   if( procID == 0 ){
     wtime = MPI_Wtime();
   }
@@ -109,63 +133,53 @@ int main(int argc, char *argv[])
   for(int iter=0; iter<10; iter++){
     //MPI_Send
     if( idx >= 1 ){
-      ierr = MPI_Isend(&aRow[0], nLocaly, MPI_LONG_LONG, (idx-1)*sqrt(p)+idy, 666, MPI_COMM_WORLD,&send_request);
+      ierr = MPI_Isend(&aUrow[0], nLocaly, MPI_LONG_LONG, (idx-1)*sqrt(p)+idy, 666, MPI_COMM_WORLD,&send_request);
       if( idy >= 1 ){
-        ierr = MPI_Isend(&aEntry, 1, MPI_LONG_LONG, (idx-1)*sqrt(p)+idy-1, 666, MPI_COMM_WORLD,&send_request);
+        ierr = MPI_Isend(&aULentry, 1, MPI_LONG_LONG, (idx-1)*sqrt(p)+idy-1, 666, MPI_COMM_WORLD,&send_request);
       }
     }
     if( idy >= 1 ){
-      ierr = MPI_Isend(&aCol[0], nLocalx, MPI_LONG_LONG, procID-1, 666, MPI_COMM_WORLD,&send_request);
+      ierr = MPI_Isend(&aLcol[0], nLocalx, MPI_LONG_LONG, procID-1, 666, MPI_COMM_WORLD,&send_request);
     }
+    
     //MPI_Recv
     if( idx < sqrt(p)-1 ){
-      ierr = MPI_Recv(aRow, nLocaly, MPI_LONG_LONG, (idx+1)*sqrt(p)+idy, 666, MPI_COMM_WORLD, &status);
+      ierr = MPI_Recv(aLrow, nLocaly, MPI_LONG_LONG, (idx+1)*sqrt(p)+idy, 666, MPI_COMM_WORLD, &status);
       if( idy < sqrt(p)-1 ){
-        ierr = MPI_Recv(&aEntry, 1, MPI_LONG_LONG, (idx+1)*sqrt(p)+idy+1, 666, MPI_COMM_WORLD, &status);
+        ierr = MPI_Recv(&aLRentry, 1, MPI_LONG_LONG, (idx+1)*sqrt(p)+idy+1, 666, MPI_COMM_WORLD, &status);
       }
     }
     if( idy < sqrt(p)-1 ){
-      ierr = MPI_Recv(aCol, nLocalx, MPI_LONG_LONG, procID+1, 666, MPI_COMM_WORLD, &status);
+      MPI_Recv(aRcol, nLocalx, MPI_LONG_LONG, procID+1, 666, MPI_COMM_WORLD, &status);
     }
     
     MPI_Barrier(MPI_COMM_WORLD);
-  
-    //fiugre out which entry stay put in submatrix by modifying nLocal
-    int idxILow(0), idyJLow(0);
-    int idxIHi(nLocalx), idyJHi(nLocaly);
+    
     if( idx == 0 ){
-      idxILow = 1;
-      matrixALocal[1][nLocaly] = aCol[1];
-    }
-    if( idy == 0 ){
-      idyJLow = 1;
+      matrixALocal[1][nLocaly] = aRcol[1];
     }
     if( idx == sqrt(p)-1 ){
-      idxIHi = nLocalx-1;
-      matrixALocal[nLocalx-1][nLocaly] = aCol[nLocalx-1];
+      matrixALocal[nLocalx-1][nLocaly] = aRcol[nLocalx-1];
     }
-    if( idy == sqrt(p)-1 ){
-      idyJHi = nLocaly-1;
-    }
-    matrixALocal[nLocalx][nLocaly] = aEntry;
+    matrixALocal[nLocalx][nLocaly] = aLRentry;
     for(int j=0; j<nLocaly; j++){
-      matrixALocal[nLocalx][j] = aRow[j];
+      matrixALocal[nLocalx][j] = aLrow[j];
     }
-    matrixALocal[0][nLocaly] = aCol[0];         //last column
+    matrixALocal[0][nLocaly] = aRcol[0];         //last column
     for(int i=idxILow; i<idxIHi; i++){
       if(i<nLocalx-1){
-        matrixALocal[i+1][nLocaly] = aCol[i+1]; //(i+1)th row, last column
+        matrixALocal[i+1][nLocaly] = aRcol[i+1]; //(i+1)th row, last column
       }
       for(int j=idyJLow; j<idyJHi; j++){
         matrixALocal[i][j] = f( matrixALocal[i][j], matrixALocal[i+1][j], matrixALocal[i][j+1], matrixALocal[i+1][j+1]);
       }
-      aCol[i] = matrixALocal[i][0];             //ith row, first column, to be sent
+      aLcol[i] = matrixALocal[i][0];             //ith row, first column, to be sent
     }
     for(int j=0; j<nLocaly; j++){
-      aRow[j] = matrixALocal[0][j];
+      aUrow[j] = matrixALocal[0][j];
     }
-    aEntry = matrixALocal[0][0];
-    
+    aULentry = matrixALocal[0][0];
+
   }
   
   //result output
@@ -208,4 +222,6 @@ int main(int argc, char *argv[])
   }
   
   MPI_Finalize ( );
+
+  
 }
