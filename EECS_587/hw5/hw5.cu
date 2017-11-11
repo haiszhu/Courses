@@ -144,17 +144,33 @@ int main(int argc, char *argv[]){
     MatBlockSum <<<gridDim, blockDim >>>(dev_a, dev_blockSum, N, N0, N);
      cudaMemcpy(blockSum, dev_blockSum, ((N-1)/TPB + 1)*((N-1)/TPB + 1)*sizeof(double),cudaMemcpyDeviceToHost);
   
-  
-    double* blockSum2 = new double[((N-1)/TPB/TPB + 1)*((N-1)/TPB/TPB + 1)];
-    double* dev_blockSum2;
-    cudaMalloc((void **)&dev_blockSum2, ((N-1)/TPB/TPB + 1)*((N-1)/TPB/TPB + 1)*sizeof(double));
-    dim3 gridDim2((N-1)/TPB/TPB + 1,(N-1)/TPB/TPB + 1);
-    dim3 blockDim2(TPB, TPB);
-    MatBlockSum <<< gridDim2, blockDim2>>>(dev_blockSum, dev_blockSum2,(N-1)/TPB + 1,(N-1)/TPB + 1, ((N-1)/TPB/TPB + 1)*TPB);
-    cudaMemcpy(blockSum2, dev_blockSum2, ((N-1)/TPB/TPB + 1)*((N-1)/TPB/TPB + 1)*sizeof(double),cudaMemcpyDeviceToHost);
-  
-  
-
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+ /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    int flag = (N-1)/TPB;
+    
+    while (flag > 0){
+      double* blockSum2 = new double[(flag/TPB+1)*(flag/TPB+1)*sizeof(double)];
+      double* dev_blockSum2;
+      cudaMalloc((void **)&dev_blockSum2, (flag/TPB + 1)*(flag/TPB + 1)*sizeof(double));
+      gridDim.x = flag/TPB + 1;
+      gridDim.y = flag/TPB + 1;
+      MatBlockSum <<< gridDim, blockDim>>>(dev_blockSum, dev_blockSum2,flag + 1,flag + 1, (flag/TPB + 1)*TPB);
+      cudaMemcpy(blockSum2, dev_blockSum2, (flag/TPB + 1)*(flag/TPB + 1)*sizeof(double),cudaMemcpyDeviceToHost);
+      flag = flag/TPB;
+      dev_blockSum = dev_blockSum2;
+        double totalSum2 = 0;
+        //for (int i=0; i<((N/TPB-1)/TPB + 1)*((N/TPB-1)/TPB + 1); i++){
+        for (int i=0; i<(flag + 1)*(flag + 1); i++){
+            totalSum2 = totalSum2 + blockSum2[i];
+            //cout << blockSum[i] << " ";
+        }
+      cout << blockSum2[0] << endl;
+    }
+    
+    
+    
+    
     double temp = 0;
     double verifyValue = 0;
     for(int i=0; i<N0; i++)
@@ -178,20 +194,18 @@ int main(int argc, char *argv[]){
       totalSum = totalSum + blockSum[i];
       //cout << blockSum[i] << " ";
     }
-    double totalSum2 = 0;
-    for (int i=0; i<((N/TPB-1)/TPB + 1)*((N/TPB-1)/TPB + 1); i++){
-      totalSum2 = totalSum2 + blockSum2[i];
-    //cout << blockSum[i] << " ";
-    }
+    
     cout << endl;
     cout << totalSum << endl;
-    cout << totalSum2 << endl;
+    //cout << totalSum2 << endl;
+    //cout << totalSum3 << endl;
     cout << verifyValue << endl;
     cudaFree(dev_a);
     cudaFree(dev_b);
     //return 0;
     //system("pause");
 }
+
 
 
 
