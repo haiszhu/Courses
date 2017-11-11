@@ -87,6 +87,10 @@ __global__ void MatMedian(double* A, double* B, int N, int N0){
     //B[i + j*N] = 2*temp[threadIdx.y][threadIdx.x];
     //B[i+j*N] = A[i+j*N]+A[i+1+j*N];
     B[i+j*N] = temp[threadIdx.y+1][threadIdx.x+1] + temp[threadIdx.y+1][threadIdx.x+2]+temp[threadIdx.y+1][threadIdx.x]+temp[threadIdx.y][threadIdx.x+1]+temp[threadIdx.y+2][threadIdx.x+1];
+  } else if ((0 == i) || (i == N0-1) || (0 == j) || (j == N0-1)) {
+    B[i+j*N] = temp[threadIdx.y+1][threadIdx.x+1];
+  } else {
+    B[i+j*N] = 0;
   }
     //B[i + j*N] = 2*A[i + j*N];
 }
@@ -200,6 +204,18 @@ int main(int argc, char *argv[]){
     //cout << totalSum2 << endl;
     //cout << totalSum3 << endl;
     cout << verifyValue << endl;
+    for (int i = 0; i < N; ++i){
+      for (int j = 0; j < N; ++j){
+        cout << b[i][j] << " ";
+      }
+      cout << endl;
+    }
+    for (int i = 0; i < N; ++i){
+      for (int j = 0; j < N; ++j){
+        cout << a[i][j] << " ";
+      }
+      cout << endl;
+    }
     cudaFree(dev_a);
     cudaFree(dev_b);
     //return 0;
