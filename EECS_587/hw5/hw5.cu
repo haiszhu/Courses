@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cuda_runtime.h> // For the CUDA runtime routines (prefixed with "cuda_")
 #include <math.h>
+#include <chrono>
 
 #include "device_launch_parameters.h"
 
@@ -86,7 +87,47 @@ __global__ void MatMedian(double* A, double* B, int N, int N0){
   if ((0 < i) && (i < N0-1) && (0 < j) && (j < N0-1)){
     //B[i + j*N] = 2*temp[threadIdx.y][threadIdx.x];
     //B[i+j*N] = A[i+j*N]+A[i+1+j*N];
-    B[i+j*N] = temp[threadIdx.y+1][threadIdx.x+1] + temp[threadIdx.y+1][threadIdx.x+2]+temp[threadIdx.y+1][threadIdx.x]+temp[threadIdx.y][threadIdx.x+1]+temp[threadIdx.y+2][threadIdx.x+1];
+    //B[i+j*N] = temp[threadIdx.y+1][threadIdx.x+1] + temp[threadIdx.y+1][threadIdx.x+2]+temp[threadIdx.y+1][threadIdx.x]+temp[threadIdx.y][threadIdx.x+1]+temp[threadIdx.y+2][threadIdx.x+1];
+      double a = temp[threadIdx.y+1][threadIdx.x+2];
+      double b = temp[threadIdx.y+1][threadIdx.x];
+      double c = temp[threadIdx.y][threadIdx.x+1];
+      double d = temp[threadIdx.y+2][threadIdx.x+1];
+      double e = temp[threadIdx.y+1][threadIdx.x+1];;
+      //sort (a, b) and (c, d) pair
+      B[i+j*N] =  b < a ? d < c ? b < d ? a < e ? a < d ? e < d ? e : d
+      : c < a ? c : a
+      : e < d ? a < d ? a : d
+      : c < e ? c : e
+      : c < e ? b < c ? a < c ? a : c
+      : e < b ? e : b
+      : b < e ? a < e ? a : e
+      : c < b ? c : b
+      : b < c ? a < e ? a < c ? e < c ? e : c
+      : d < a ? d : a
+      : e < c ? a < c ? a : c
+      : d < e ? d : e
+      : d < e ? b < d ? a < d ? a : d
+      : e < b ? e : b
+      : b < e ? a < e ? a : e
+      : d < b ? d : b
+      : d < c ? a < d ? b < e ? b < d ? e < d ? e : d
+      : c < b ? c : b
+      : e < d ? b < d ? b : d
+      : c < e ? c : e
+      : c < e ? a < c ? b < c ? b : c
+      : e < a ? e : a
+      : a < e ? b < e ? b : e
+      : c < a ? c : a
+      : a < c ? b < e ? b < c ? e < c ? e : c
+      : d < b ? d : b
+      : e < c ? b < c ? b : c
+      : d < e ? d : e
+      : d < e ? a < d ? b < d ? b : d
+      : e < a ? e : a
+      : a < e ? b < e ? b : e
+      : d < a ? d : a;
+      
+    
   } else if ((0 == i) || (i == N0-1) || (0 == j) || (j == N0-1)) {
     B[i+j*N] = temp[threadIdx.y+1][threadIdx.x+1];
   } else {
@@ -139,11 +180,18 @@ int main(int argc, char *argv[]){
     
     dim3 gridDim((N-1)/TPB + 1, (N-1)/TPB + 1);
     dim3 blockDim(TPB, TPB);
+    auto t1 = std::chrono::high_resolution_clock::now();
     //MatMedian <<<gridDim, blockDim >>>(dev_a, dev_b, N, N0);
-    MatMedian <<<gridDim, blockDim >>>(dev_a, dev_b, N, N0);
-
+    for (int iter=0; iter<10; iter++){
+      MatMedian <<<gridDim, blockDim >>>(dev_a, dev_b, N, N0);
+      //MatMedian <<<gridDim, blockDim >>>(dev_b, dev_a, N, N0);
+      double * temp;
+      temp = dev_a;
+      dev_a = dev_b;
+      dev_b =temp;
+    }
     //cudaMemcpy2D(b[0],pitch,dev_b,sizeof(double)*N,sizeof(double)*N,N,cudaMemcpyDeviceToHost);
-    cudaMemcpy2D(b[0],sizeof(double)*N,dev_b,pitch,sizeof(double)*N,N,cudaMemcpyDeviceToHost);
+    cudaMemcpy2D(b[0],sizeof(double)*N,dev_a,pitch,sizeof(double)*N,N,cudaMemcpyDeviceToHost);
     //cudaMemcpy2D(blockSum[0],pitch_b,dev_blockSum,sizeof(double)*((N-1)/TPB + 1),sizeof(double)*((N-1)/TPB + 1),(N-1)/TPB + 1,cudaMemcpyDeviceToHost);
     MatBlockSum <<<gridDim, blockDim >>>(dev_a, dev_blockSum, N, N0, N);
      cudaMemcpy(blockSum, dev_blockSum, ((N-1)/TPB + 1)*((N-1)/TPB + 1)*sizeof(double),cudaMemcpyDeviceToHost);
@@ -171,7 +219,8 @@ int main(int argc, char *argv[]){
         }
       cout << blockSum2[0] << endl;
     }
-    
+    auto t2 = std::chrono::high_resolution_clock::now();
+    std::cout <<"Time taken: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2-t1).count() << "ms" << std::endl;
     
     
     
@@ -206,21 +255,24 @@ int main(int argc, char *argv[]){
     cout << verifyValue << endl;
     for (int i = 0; i < N; ++i){
       for (int j = 0; j < N; ++j){
-        cout << b[i][j] << " ";
+       // cout << b[i][j] << " ";
       }
-      cout << endl;
+      //cout << endl;
     }
     for (int i = 0; i < N; ++i){
       for (int j = 0; j < N; ++j){
-        cout << a[i][j] << " ";
+        //cout << a[i][j] << " ";
       }
-      cout << endl;
+      //cout << endl;
     }
     cudaFree(dev_a);
     cudaFree(dev_b);
     //return 0;
     //system("pause");
 }
+
+
+
 
 
 
