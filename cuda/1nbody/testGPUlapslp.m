@@ -30,24 +30,25 @@ end
 
 %
 N = 20000;
-M = 800;
+M = 1000;
 srcx = rand(1,N); srcy = rand(1,N); srcz = rand(1,N);
 targx = rand(1,M); targy = rand(1,M); targz = rand(1,M);
 x = rand(1,N);
 
 %
 tic, 
-[A,y] = mexGPUlapslp(srcx,srcy,srcz,targx,targy,targz,x); 
+y = mexGPUlapslp(srcx,srcy,srcz,targx,targy,targz,x); 
+% A = reshape(A(:),N,M)';
 toc
 
 %
 tic, 
 A2 = 1./sqrt((srcx - targx(:)).^2+(srcy - targy(:)).^2+(srcz - targz(:)).^2); 
-y2 = A*x(:);
+y2 = A2*x(:);
 toc
 
 %
 diff = abs(y-y2); max(diff)
-diffA = abs(A-A2); max(diffA(:))
+% diffA = abs(A-A2); max(diffA(:))
 
 keyboard
