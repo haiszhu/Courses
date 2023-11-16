@@ -48,10 +48,10 @@ void mexFunction(int nlhs, mxArray *plhs[],
   mxDouble *y;               /* output: potential */
   double *d_src, *d_targ;
   double *d_A;
+  double *d_x, *d_y;
   int N, M;                  /* dimension */
   char const * const errId = "parallel:gpu:culapslpmat:InvalidInput";
   char const * const errMsg = "Invalid input to MEX file.";
-  double *d_x, *d_y;
   
   src = mxGetDoubles(prhs[0]);   /* source */
   targ = mxGetDoubles(prhs[1]);  /* target */
@@ -79,8 +79,6 @@ void mexFunction(int nlhs, mxArray *plhs[],
   culapslpmat<<<blocksPerGrid, threadsPerBlock>>>(d_src, d_targ, d_A, N, M);
   
   /* cuBLAS matvec potential */
-  plhs[0] = mxCreateDoubleMatrix((mwSize)M, (mwSize)1, mxREAL);
-  y = mxGetDoubles(plhs[0]); /* 1st output */
   cublasHandle_t handle;
   cublasCreate(&handle);
   cudaMalloc((void**)&d_x, N*sizeof(double));
@@ -88,6 +86,10 @@ void mexFunction(int nlhs, mxArray *plhs[],
   cudaMalloc((void**)&d_y, M*sizeof(double));
   double alpha = 1.0, beta = 0.0;
   cublasDgemv(handle, CUBLAS_OP_T, N, M, &alpha, d_A, N, d_x, 1, &beta, d_y, 1);
+
+  /* Copy result back to host */
+  plhs[0] = mxCreateDoubleMatrix((mwSize)M, (mwSize)1, mxREAL);
+  y = mxGetDoubles(plhs[0]); /* 1st output */
   cudaMemcpy(y, d_y, M*sizeof(double), cudaMemcpyDeviceToHost);
   
   /* free gpu memory */
