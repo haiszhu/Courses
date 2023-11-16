@@ -1,4 +1,5 @@
-%
+% setenv("MW_NVCC_PATH","/usr/local/cuda-12.3/bin")
+% mexcuda('-v', 'mexGPUExample.cu','NVCCFLAGS=-gencode=arch=compute_80,code=sm_80');
 %
 
 if 0
@@ -30,14 +31,14 @@ end
 
 %
 N = 20000;
-M = 1000;
+M = 30000;
 srcx = rand(1,N); srcy = rand(1,N); srcz = rand(1,N);
 targx = rand(1,M); targy = rand(1,M); targz = rand(1,M);
 x = rand(1,N);
 
 %
 tic, 
-y = mexGPUlapslp(srcx,srcy,srcz,targx,targy,targz,x); 
+y = mexGPUlapslp([srcx;srcy;srcz],[targx;targy;targz],x); 
 % A = reshape(A(:),N,M)';
 toc
 
@@ -48,7 +49,7 @@ y2 = A2*x(:);
 toc
 
 %
-diff = abs(y-y2); max(diff)
+diff = abs(y-y2)/max(abs(y)); max(diff)
 % diffA = abs(A-A2); max(diffA(:))
 
 keyboard
