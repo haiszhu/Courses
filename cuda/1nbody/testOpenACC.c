@@ -1,6 +1,6 @@
 // https://docs.nvidia.com/hpc-sdk/compilers/openacc-gs/index.html for reference
 // install hpc-sdk apt version ... https://developer.nvidia.com/hpc-sdk-downloads
-// create ~/nvidia.sh ... https://www.scivision.dev/install-nvidia-hpc-free-compiler/
+// create ~/nvidia.sh ... https://docs.nvidia.com/hpc-sdk//hpc-sdk-install-guide/index.html or https://www.scivision.dev/install-nvidia-hpc-free-compiler/
 // to compile ... nvc -acc -gpu=cc80 testOpenACC.c
 // ./a.out ... Success!
 #include <stdio.h>

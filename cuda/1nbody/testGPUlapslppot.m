@@ -29,29 +29,75 @@ system(cmd1);
 system(cmd2);
 end
 
+%============= source ~= target =============
 %
 N = 1e+05;
-M = 1e+06;
-srcx = rand(1,N); srcy = rand(1,N); srcz = rand(1,N);
-targx = rand(1,M); targy = rand(1,M); targz = rand(1,M);
+M = 1e+05;
+src = rand(3,N);
+targ = rand(3,M); targy = rand(1,M); targz = rand(1,M);
 x = rand(1,N);
-
 %
-tic, 
-y = mexGPUlapslppot([srcx;srcy;srcz],[targx;targy;targz],x); 
+[y,curuntime] = mexGPUlapslppot(src,targ,x); 
 % A = reshape(A(:),N,M)';
-toc
+disp([' ========== check src ~= targ ==========  ']);
+disp([' cuda kernel run time: ',num2str(curuntime),' in milliseconds']); % about 140 seconds for 1e+06 to 1e+06 pts
 
 %
 tic, 
 y2 = zeros(M,1);
 for j=1:N
-  y2 = y2 + x(j)./sqrt((srcx(j) - targx(:)).^2+(srcy(j) - targy(:)).^2+(srcz(j) - targz(:)).^2); 
+  y2 = y2 + x(j)./sqrt((src(1,j) - targ(1,:)').^2+(src(2,j) - targ(2,:)').^2+(src(3,j) - targ(3,:)').^2); 
 end
-toc
+cpuruntime = toc;
+disp([' cpu kernel run time: ',num2str(cpuruntime*1e+03),' in milliseconds']); % 
+disp([' speedup: ',num2str(floor(cpuruntime*1e+03/curuntime)),' times']); % 
 
 %
-diff = abs(y-y2)/max(abs(y)); max(diff)
+diff = abs(y-y2)/max(abs(y)); 
+disp([' max rel diff between cpu and gpu: ', num2str(max(diff)), ' ']); 
+disp([' ']);
+
 % diffA = abs(A-A2); max(diffA(:))
 
+%============= source = target =============
+%
+N = 1e+04;
+src = rand(3,N); 
+targ = src;
+x = rand(1,N);
+
+%
+[y,curuntime] = mexGPUlapslppot(src,targ,x); 
+% A = reshape(A(:),N,M)';
+disp([' ========== check src = targ ==========  ']);
+disp([' cuda kernel run time: ',num2str(curuntime),' in milliseconds']); % about 140 seconds for 1e+06 to 1e+06 pts
+
+tic, 
+A = 1./sqrt((src(1,:) - targ(1,:)').^2+(src(2,:) - targ(2,:)').^2+(src(3,:) - targ(3,:)').^2); 
+A(diagind(A)) = 0;
+y2 = A*x(:);
+cpuruntime = toc;
+disp([' cpu kernel run time: ',num2str(cpuruntime*1e+03),' in milliseconds']); % 
+disp([' speedup: ',num2str(floor(cpuruntime*1e+03/curuntime)),' times']); % 
+
+%
+diff = abs(y-y2)/max(abs(y)); 
+disp([' max rel diff between cpu and gpu: ', num2str(max(diff)), ' ']); 
+disp([' ']);
+
 keyboard
+
+function i = diagind(A)
+% function i = diagind(A)
+%
+% return diagonal indices of a square matrix, useful for changing a diagonal
+% in O(N) effort, rather than O(N^2) if add a matrix to A using matlab diag()
+%
+% barnett 2/6/08
+
+N = size(A,1);
+if size(A,2)~=N
+  disp('input must be square!');
+end
+i = sub2ind(size(A), 1:N, 1:N);
+end
