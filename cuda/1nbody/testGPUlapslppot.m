@@ -29,6 +29,9 @@ system(cmd1);
 system(cmd2);
 end
 
+pmmops = 9;
+sqrtops = 1;
+
 %============= source ~= target =============
 %
 N = 1e+05;
@@ -40,7 +43,10 @@ x = rand(1,N);
 [y,curuntime] = mexGPUlapslppot(src,targ,x); 
 % A = reshape(A(:),N,M)';
 disp([' ========== check src ~= targ ==========  ']);
-disp([' cuda kernel run time: ',num2str(curuntime),' in milliseconds']); % about 140 seconds for 1e+06 to 1e+06 pts
+disp([' cuda kernel run time: ',num2str(curuntime),' milliseconds']); % about 140 seconds for 1e+06 to 1e+06 pts
+disp([' total plus minus multiplication: ', num2str(pmmops*N*M,'%.3e')]);
+disp([' total rsqrt: ', num2str(sqrtops*N*M,'%.3e')]);
+disp([' performance (total/run time): ', num2str((pmmops+sqrtops)*N*M/(curuntime/1e+03),'%.3e'), ' FLOPS' ])
 
 %
 tic, 
@@ -49,7 +55,7 @@ for j=1:N
   y2 = y2 + x(j)./sqrt((src(1,j) - targ(1,:)').^2+(src(2,j) - targ(2,:)').^2+(src(3,j) - targ(3,:)').^2); 
 end
 cpuruntime = toc;
-disp([' cpu kernel run time: ',num2str(cpuruntime*1e+03),' in milliseconds']); % 
+disp([' cpu kernel run time: ',num2str(cpuruntime*1e+03),' milliseconds']); % 
 disp([' speedup: ',num2str(floor(cpuruntime*1e+03/curuntime)),' times']); % 
 
 %
@@ -70,7 +76,7 @@ x = rand(1,N);
 [y,curuntime] = mexGPUlapslppot(src,targ,x); 
 % A = reshape(A(:),N,M)';
 disp([' ========== check src = targ ==========  ']);
-disp([' cuda kernel run time: ',num2str(curuntime),' in milliseconds']); % about 140 seconds for 1e+06 to 1e+06 pts
+disp([' cuda kernel run time: ',num2str(curuntime),' milliseconds']); % about 140 seconds for 1e+06 to 1e+06 pts
 
 tic, 
 A = 1./sqrt((src(1,:) - targ(1,:)').^2+(src(2,:) - targ(2,:)').^2+(src(3,:) - targ(3,:)').^2); 

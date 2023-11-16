@@ -36,8 +36,8 @@ void __global__ culapslppot(double const * const src,
       dz = src[3*j+2] - targ[3*i+2];
       dd = dx*dx + dy*dy + dz*dz;
       if (dd>threshsq){
-        y[i] += x[j]*rsqrt(dx*dx+dy*dy+dz*dz);
-        // y[i] += x[j]/sqrt(dx*dx+dy*dy+dz*dz);
+        y[i] += x[j]*rsqrt(dd);
+        // y[i] += x[j]/sqrt(dd);
       }
     }
   }
