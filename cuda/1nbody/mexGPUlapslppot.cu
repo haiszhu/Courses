@@ -87,9 +87,10 @@ void mexFunction(int nlhs, mxArray *plhs[],
   cudaMemcpy(d_targ, targ, 3*M*sizeof(double), cudaMemcpyHostToDevice);
   cudaMalloc((void**)&d_x, N*sizeof(double));
   cudaMemcpy(d_x, x, N*sizeof(double), cudaMemcpyHostToDevice);
-  cudaMalloc((void**)&d_y, M * sizeof(double));
+  cudaMalloc((void**)&d_y, M*sizeof(double));
   cudaEventRecord(start);
   culapslppot<<<blocksPerGrid, threadsPerBlock>>>(d_src, d_targ, d_x, d_y, N, M);
+  cudaDeviceSynchronize();
   cudaEventRecord(stop);
   cudaEventSynchronize(stop);
   float milliseconds = 0;

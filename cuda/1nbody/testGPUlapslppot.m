@@ -1,6 +1,28 @@
 % setenv("MW_NVCC_PATH","/usr/local/cuda-12.3/bin")
-% mexcuda('-v', 'mexGPUExample.cu','NVCCFLAGS=-gencode=arch=compute_80,code=sm_80');
+% mexcuda('-v', 'mexGPUlapslppot.cu','NVCCFLAGS=-gencode=arch=compute_80,code=sm_80','CFLAGS="\$CFLAGS -DMATLAB_DEFAULT_RELEASE=R2021b"');
 %
+
+if 0
+  % below load testGPUlapslppot.cu data
+  % !nvcc testGPUlapslppot.cu
+  % !./a.out 
+  %
+  
+  % load from ./a.out
+  mu = readmatrix('mu.txt');
+  src = readmatrix('src.txt');
+  targ = readmatrix('targ.txt');
+  pot = readmatrix('pot.txt');
+  N = size(src,2);
+  M = size(targ,2);
+  
+  % compute 
+  pot2 = zeros(M,1);
+  for j=1:N
+    pot2 = pot2 + mu(j)./sqrt((src(1,j) - targ(1,:)').^2+(src(2,j) - targ(2,:)').^2+(src(3,j) - targ(3,:)').^2); 
+  end
+
+end
 
 if 0
 files = {'mexGPUlapslppot'};
@@ -40,7 +62,7 @@ src = rand(3,N);
 targ = rand(3,M); targy = rand(1,M); targz = rand(1,M);
 x = rand(1,N);
 %
-[y,curuntime] = mexGPUlapslppot(src,targ,x); 
+[pot,curuntime] = mexGPUlapslppot(src,targ,x); 
 % A = reshape(A(:),N,M)';
 disp([' ========== check src ~= targ ==========  ']);
 disp([' cuda kernel run time: ',num2str(curuntime),' milliseconds']); % about 140 seconds for 1e+06 to 1e+06 pts
@@ -50,16 +72,16 @@ disp([' performance (total/run time): ', num2str((pmmops+sqrtops)*N*M/(curuntime
 
 %
 tic, 
-y2 = zeros(M,1);
+pot2 = zeros(M,1);
 for j=1:N
-  y2 = y2 + x(j)./sqrt((src(1,j) - targ(1,:)').^2+(src(2,j) - targ(2,:)').^2+(src(3,j) - targ(3,:)').^2); 
+  pot2 = pot2 + x(j)./sqrt((src(1,j) - targ(1,:)').^2+(src(2,j) - targ(2,:)').^2+(src(3,j) - targ(3,:)').^2); 
 end
 cpuruntime = toc;
 disp([' cpu kernel run time: ',num2str(cpuruntime*1e+03),' milliseconds']); % 
 disp([' speedup: ',num2str(floor(cpuruntime*1e+03/curuntime)),' times']); % 
 
 %
-diff = abs(y-y2)/max(abs(y)); 
+diff = abs(pot-pot2)/max(abs(pot)); 
 disp([' max rel diff between cpu and gpu: ', num2str(max(diff)), ' ']); 
 disp([' ']);
 
@@ -73,7 +95,7 @@ targ = src;
 x = rand(1,N);
 
 %
-[y,curuntime] = mexGPUlapslppot(src,targ,x); 
+[pot,curuntime] = mexGPUlapslppot(src,targ,x); 
 % A = reshape(A(:),N,M)';
 disp([' ========== check src = targ ==========  ']);
 disp([' cuda kernel run time: ',num2str(curuntime),' milliseconds']); % about 140 seconds for 1e+06 to 1e+06 pts
@@ -81,13 +103,13 @@ disp([' cuda kernel run time: ',num2str(curuntime),' milliseconds']); % about 14
 tic, 
 A = 1./sqrt((src(1,:) - targ(1,:)').^2+(src(2,:) - targ(2,:)').^2+(src(3,:) - targ(3,:)').^2); 
 A(diagind(A)) = 0;
-y2 = A*x(:);
+pot2 = A*x(:);
 cpuruntime = toc;
 disp([' cpu kernel run time: ',num2str(cpuruntime*1e+03),' milliseconds']); % 
 disp([' speedup: ',num2str(floor(cpuruntime*1e+03/curuntime)),' times']); % 
 
 %
-diff = abs(y-y2)/max(abs(y)); 
+diff = abs(pot-pot2)/max(abs(pot)); 
 disp([' max rel diff between cpu and gpu: ', num2str(max(diff)), ' ']); 
 disp([' ']);
 
