@@ -83,7 +83,7 @@ A = 1./sqrt((src(1,:) - targ(1,:)').^2+(src(2,:) - targ(2,:)').^2+(src(3,:) - ta
 A(diagind(A)) = 0;
 y2 = A*x(:);
 cpuruntime = toc;
-disp([' cpu kernel run time: ',num2str(cpuruntime*1e+03),' in milliseconds']); % 
+disp([' cpu kernel run time: ',num2str(cpuruntime*1e+03),' milliseconds']); % 
 disp([' speedup: ',num2str(floor(cpuruntime*1e+03/curuntime)),' times']); % 
 
 %
