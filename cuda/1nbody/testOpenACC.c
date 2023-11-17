@@ -3,14 +3,15 @@
 // create ~/nvidia.sh ... https://docs.nvidia.com/hpc-sdk//hpc-sdk-install-guide/index.html or https://www.scivision.dev/install-nvidia-hpc-free-compiler/
 // to compile ... nvc -acc -gpu=cc80 testOpenACC.c
 // ./a.out ... Success!
+// srun -p gpu --gpus=1 -C "a100" --exclusive --pty bash -i 
 #include <stdio.h>
 #include <stdlib.h> 
 #include <time.h>
 #include <math.h>
 #include <omp.h>
 
-#define N 40000
-#define M 50000
+#define N 1000000
+#define M 1000000
 int main() {
   double (*src)[N] = malloc(3*N*sizeof(double));
   double (*targ)[M] = malloc(3*M*sizeof(double)); 

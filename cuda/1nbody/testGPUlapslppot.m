@@ -1,5 +1,6 @@
 % setenv("MW_NVCC_PATH","/usr/local/cuda-12.3/bin")
 % mexcuda('-v', 'mexGPUlapslppot.cu','NVCCFLAGS=-gencode=arch=compute_80,code=sm_80','CFLAGS="\$CFLAGS -DMATLAB_DEFAULT_RELEASE=R2021b"');
+% https://xmartlabs.github.io/cuda-calculator/
 %
 
 if 0
@@ -56,8 +57,8 @@ sqrtops = 1;
 
 %============= source ~= target =============
 %
-N = 1e+05;
-M = 1e+05;
+N = 2e+05;
+M = 2e+05;
 src = rand(3,N);
 targ = rand(3,M); targy = rand(1,M); targz = rand(1,M);
 x = rand(1,N);
