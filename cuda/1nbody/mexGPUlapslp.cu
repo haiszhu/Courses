@@ -12,7 +12,12 @@
 #include "cublas_v2.h"
 /* these are for matlab */
 #include "mex.h"
+#include "matrix.h"
 #include "gpu/mxGPUArray.h"
+
+#ifndef mxGetDoubles
+#define mxGetDoubles(p) mxGetPr(p)
+#endif
 
 /*
  * Device code, still 1d array... instead of original [3,N] source, [3,M] target 

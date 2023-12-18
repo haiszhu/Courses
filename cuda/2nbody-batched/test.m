@@ -1,5 +1,5 @@
-%
-%
+% option 1: creat streams on GPU, a sequence of kernel launches (try this)
+% option 2: give GPU entire task graph
 clear all
 
 load('U.txt','U');

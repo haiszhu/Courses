@@ -167,7 +167,7 @@ template <int DIM, class Real> void LaplaceBatchedOMP(std::vector<Real>& U, cons
     }
   }
 
-  #pragma omp parallel for schedule(dynamic)
+  #pragma omp parallel for schedule(static)
   for (size_t t = 0; t < Xt.size()/DIM; t++) {
     int trg_node = trg_box_lst[t];
     for (int j = 0; j < 2*DIM*DIM*DIM; j++) {
@@ -430,7 +430,7 @@ int main(int argc, char** argv) {
     // Profile::Toc();
 
     Profile::Tic("3D", &comm, true);
-    nbody_near<double,3>(100000, 1000, comm);
+    nbody_near<double,3>(1000000, 1000, comm);
     Profile::Toc();
 
     Profile::print(&comm);
